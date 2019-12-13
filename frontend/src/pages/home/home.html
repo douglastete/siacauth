@@ -1,0 +1,61 @@
+<template>
+
+    <head>
+        <title>HOME</title>
+        <link async rel="stylesheet" href="home.css">
+        <script defer src="home.js"></script>
+    </head>
+
+
+    <nav>
+        <div class="nav-wrapper">
+            <a href="#/home" class="brand-logo"><img border="0" alt="SIAC Auth Logo" src="../../assets/images/logohome.png"></a>
+            <a href="#!" data-target="menuMobile" class="sidenav-trigger">
+                <i class="material-icons">menu</i></a>
+            <ul class="right hide-on-med-and-down">
+                <li><a href="#/empresas">Selecionar empresa</a></li>
+                <li><a href="#!" name="txtEmpresa"></a></li>
+                <li>
+
+                    <a href="#!" class="dropdown-trigger" data-target="dropdownAvatar"><img id="avatar" class="circle"
+                            src="../../assets/images/yuna.jpg"></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Dropdown Structure -->
+    <ul id="dropdownAvatar" class="dropdown-content">
+        <li><a id="btnSair" class="sidenav-close" href="#!"><i class="material-icons">exit_to_app</i>Sair</a></li>
+    </ul>
+
+    <ul class="sidenav" id="menuMobile">
+
+        <div class="user-view">
+            <div class="background">
+                <img src="../../assets/images/background-menu.jpg">
+            </div>
+            <a href="#!"><img id="avatar" class="circle" src="../../assets/images/yuna.jpg"></a>
+            <a href="#!"><span id="txtName" class="black-text name">John Doe</span></a>
+            <a href="#!"><span id="txtEmail" class="black-text email">jdandturk@gmail.com</span></a>
+        </div>
+
+        <li><a class="sidenav-close" href="#/home"><i class="material-icons">home</i>Home</a></li>
+
+        <li>
+            <div class="divider"></div>
+        </li>
+
+        <li><a class="sidenav-close" href="#!" name="txtEmpresa"></a></li>
+        <li><a class="sidenav-close" href="#/empresas"><i class="material-icons">business</i>Selecionar empresa</a></li>
+
+        <li>
+            <div class="divider"></div>
+        </li>
+        <li><a id="btnSair" class="sidenav-close" href="#!"><i class="material-icons">exit_to_app</i>Sair</a></li>
+    </ul>
+
+
+    <div id="app-home"></div>
+
+</template>

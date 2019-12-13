@@ -1,0 +1,13 @@
+body {
+  background: #428bca;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+#app-root {
+  background: #dedede;
+  height: 99.9vh;
+  width: 100%;
+  border: none;
+}

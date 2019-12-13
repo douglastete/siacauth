@@ -1,0 +1,32 @@
+body {
+  background-color: #428bca;
+}
+
+nav .nav-wrapper li #avatar {
+  width: 55px;
+  height: 55px;
+  top: 4px;
+  position: relative;
+}
+
+nav .nav-wrapper .right {
+  margin-right: 5px;
+}
+.dropdown-content {
+  top: 65px !important  ;
+}
+
+.dropdown-trigger {
+  height: 64px;
+}
+
+.brand-logo {
+  margin-left: 10px;
+  margin-top: 2px;
+  width: 250px;
+  height: 25px;
+}
+
+nav ul li.active {
+  background-color: #4571b7;
+}
