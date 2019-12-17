@@ -5,10 +5,12 @@ import { authFirebase } from '../../assets/js/auth';
 import { apiClient } from '../../assets/js/axios.factory';
 import { companyLogged } from '../../assets/js/companyLogged';
 
+const io = require('socket.io-client');
+
 init();
 
 function init() {
-  const ptr = PullToRefresh.init({
+  PullToRefresh.init({
     mainElement: '#divContainer',
     instructionsPullToRefresh: 'Arraste para atualizar',
     instructionsReleaseToRefresh: 'Solte para atualizar',
@@ -21,6 +23,21 @@ function init() {
   const btnRefresh = document.getElementById('btnRefresh');
   btnRefresh.addEventListener('click', getOrders);
   getOrders();
+  configureRealTime();
+}
+
+function configureRealTime() {
+  const socket = io.connect(`https://siacauth.now.sh:3000`);
+
+  socket.on('changeData', payload => {
+    if (payload.operationType === 'insert') {
+      createOrder(payload.fullDocument);
+    } else if (payload.operationType == 'delete') {
+      removeOrder(payload.documentKey._id);
+    }
+
+    console.log(payload);
+  });
 }
 
 async function getOrders(showPreLoader = true) {
@@ -47,7 +64,19 @@ async function getOrders(showPreLoader = true) {
 
 async function clearOrders() {
   const container = document.getElementById('divOrders');
-  container.innerHTML = '';
+  while (container.firstChild) {
+    container.removeChild(container.firstChild);
+  }
+}
+
+async function removeOrder(order) {
+  const container = document.getElementById('divOrders');
+  container.childNodes.forEach(element => {
+    if (element.order._id === order) {
+      container.removeChild(element);
+      return;
+    }
+  });
 }
 
 async function showOrders() {
@@ -61,85 +90,90 @@ async function showOrders() {
       orders = resp.data.response;
     });
 
-  const container = document.getElementById('divOrders');
-  orders.forEach(e => {
-    const divCol = document.createElement('div');
-    divCol.className = 'pedido col s12 m6';
-    container.appendChild(divCol);
-
-    const divCard = document.createElement('div');
-    divCard.className = 'card blue lighten-1';
-    divCol.appendChild(divCard);
-
-    const divCardContent = document.createElement('div');
-    divCardContent.className = 'card-content white-text activator';
-    divCard.appendChild(divCardContent);
-
-    const spanTitle = document.createElement('span');
-    spanTitle.className = 'card-title';
-    spanTitle.innerText = `Pedido Nº: ${e.pedidoid}`;
-    divCardContent.appendChild(spanTitle);
-
-    const txtCliente = document.createElement('p');
-    txtCliente.innerText = `Cliente: ${e.razaosocial}`;
-    divCardContent.appendChild(txtCliente);
-
-    const txtDtEmissao = document.createElement('p');
-    txtDtEmissao.innerText = `Dt. de emissão: ${e.dtemissao.replace(/-/g, '/')}`;
-    divCardContent.appendChild(txtDtEmissao);
-
-    const txtVlrMovimento = document.createElement('p');
-    txtVlrMovimento.innerText = `Valor do pedido: ${e.vlrtotal}`;
-    divCardContent.appendChild(txtVlrMovimento);
-
-    const divCardCancelar = document.createElement('div');
-    divCardCancelar.className = 'card-action white left';
-    divCard.appendChild(divCardCancelar);
-
-    const btnCancelar = document.createElement('a');
-    btnCancelar.className = 'card-text black-text';
-    btnCancelar.innerText = 'Cancelar';
-    btnCancelar.order = e;
-    btnCancelar.addEventListener('click', cancelOrder);
-    divCardCancelar.appendChild(btnCancelar);
-
-    const iconCancelar = document.createElement('i');
-    iconCancelar.className = 'material-icons';
-    iconCancelar.innerText = 'highlight_off';
-    btnCancelar.appendChild(iconCancelar);
-
-    const divMotivos = document.createElement('div');
-    divMotivos.className = 'card-action white left ';
-    divCard.appendChild(divMotivos);
-
-    const btnMotivos = document.createElement('a');
-    btnMotivos.className = 'card-text black-text modal-trigger';
-    btnMotivos.innerText = 'Motivos';
-    btnMotivos.order = e;
-    btnMotivos.addEventListener('click', showCauses);
-    divMotivos.appendChild(btnMotivos);
-
-    const iconMotivos = document.createElement('i');
-    iconMotivos.className = 'material-icons';
-    iconMotivos.innerText = 'horizontal_split';
-    btnMotivos.appendChild(iconMotivos);
-
-    const divCardLiberar = document.createElement('div');
-    divCardLiberar.className = 'card-action white right';
-    divCard.appendChild(divCardLiberar);
-
-    const btnLiberar = document.createElement('a');
-    btnLiberar.className = 'card-text black-text';
-    btnLiberar.innerText = 'Liberar';
-    btnLiberar.order = e;
-    btnLiberar.addEventListener('click', unlockOrder);
-    divCardLiberar.appendChild(btnLiberar);
-
-    const iconLiberar = document.createElement('i');
-    iconLiberar.className = 'material-icons';
-    iconLiberar.innerText = 'check_circle';
-    btnLiberar.appendChild(iconLiberar);
+  orders.forEach(order => {
+    createOrder(order);
   });
+}
+
+function createOrder(order) {
+  const container = document.getElementById('divOrders');
+  const divCol = document.createElement('div');
+  divCol.order = order;
+  divCol.className = 'pedido col s12 m6';
+  container.appendChild(divCol);
+
+  const divCard = document.createElement('div');
+  divCard.className = 'card blue lighten-1';
+  divCol.appendChild(divCard);
+
+  const divCardContent = document.createElement('div');
+  divCardContent.className = 'card-content white-text activator';
+  divCard.appendChild(divCardContent);
+
+  const spanTitle = document.createElement('span');
+  spanTitle.className = 'card-title';
+  spanTitle.innerText = `Pedido Nº: ${order.pedidoid}`;
+  divCardContent.appendChild(spanTitle);
+
+  const txtCliente = document.createElement('p');
+  txtCliente.innerText = `Cliente: ${order.razaosocial}`;
+  divCardContent.appendChild(txtCliente);
+
+  const txtDtEmissao = document.createElement('p');
+  txtDtEmissao.innerText = `Dt. de emissão: ${order.dtemissao.replace(/-/g, '/')}`;
+  divCardContent.appendChild(txtDtEmissao);
+
+  const txtVlrMovimento = document.createElement('p');
+  txtVlrMovimento.innerText = `Valor do pedido: ${order.vlrtotal}`;
+  divCardContent.appendChild(txtVlrMovimento);
+
+  const divCardCancelar = document.createElement('div');
+  divCardCancelar.className = 'card-action white left';
+  divCard.appendChild(divCardCancelar);
+
+  const btnCancelar = document.createElement('a');
+  btnCancelar.className = 'card-text black-text';
+  btnCancelar.innerText = 'Cancelar';
+  btnCancelar.order = order;
+  btnCancelar.addEventListener('click', cancelOrder);
+  divCardCancelar.appendChild(btnCancelar);
+
+  const iconCancelar = document.createElement('i');
+  iconCancelar.className = 'material-icons';
+  iconCancelar.innerText = 'highlight_off';
+  btnCancelar.appendChild(iconCancelar);
+
+  const divMotivos = document.createElement('div');
+  divMotivos.className = 'card-action white left ';
+  divCard.appendChild(divMotivos);
+
+  const btnMotivos = document.createElement('a');
+  btnMotivos.className = 'card-text black-text modal-trigger';
+  btnMotivos.innerText = 'Motivos';
+  btnMotivos.order = order;
+  btnMotivos.addEventListener('click', showCauses);
+  divMotivos.appendChild(btnMotivos);
+
+  const iconMotivos = document.createElement('i');
+  iconMotivos.className = 'material-icons';
+  iconMotivos.innerText = 'horizontal_split';
+  btnMotivos.appendChild(iconMotivos);
+
+  const divCardLiberar = document.createElement('div');
+  divCardLiberar.className = 'card-action white right';
+  divCard.appendChild(divCardLiberar);
+
+  const btnLiberar = document.createElement('a');
+  btnLiberar.className = 'card-text black-text';
+  btnLiberar.innerText = 'Liberar';
+  btnLiberar.order = order;
+  btnLiberar.addEventListener('click', unlockOrder);
+  divCardLiberar.appendChild(btnLiberar);
+
+  const iconLiberar = document.createElement('i');
+  iconLiberar.className = 'material-icons';
+  iconLiberar.innerText = 'check_circle';
+  btnLiberar.appendChild(iconLiberar);
 }
 
 async function unlockOrder(el) {

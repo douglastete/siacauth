@@ -27,6 +27,7 @@
     "firebase": "^7.3.0",
     "materialize-css": "^1.0.0",
     "modern-css-reset": "^1.0.4",
-    "pulltorefreshjs": "^0.1.20"
+    "pulltorefreshjs": "^0.1.20",
+    "socket.io-client": "^2.3.0"
   }
 }
