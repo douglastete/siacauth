@@ -1,10 +1,10 @@
 const firebaseAdmin = require('firebase-admin');
 
-const serviceAccount = require('./siacauth-firebase-adminsdk-ipxt8-6ea97c817e.json');
+const serviceAccount = require('./firebase-adminsdk.json');
 
 firebaseAdmin.initializeApp({
   credential: firebaseAdmin.credential.cert(serviceAccount),
-  databaseURL: 'https://siacauth.firebaseio.com'
+  databaseURL: process.env.DATABASE_URL_FIREBASE
 });
 
 module.exports = firebaseAdmin;

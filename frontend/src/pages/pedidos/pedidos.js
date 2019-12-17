@@ -6,6 +6,7 @@ import { apiClient } from '../../assets/js/axios.factory';
 import { companyLogged } from '../../assets/js/companyLogged';
 
 const io = require('socket.io-client');
+const socket = io.connect(process.env.API_URL_BASE);
 
 init();
 
@@ -27,16 +28,12 @@ function init() {
 }
 
 function configureRealTime() {
-  const socket = io.connect(`https://siacauth.now.sh:3000`);
-
   socket.on('changeData', payload => {
     if (payload.operationType === 'insert') {
       createOrder(payload.fullDocument);
     } else if (payload.operationType == 'delete') {
       removeOrder(payload.documentKey._id);
     }
-
-    console.log(payload);
   });
 }
 

@@ -4,7 +4,7 @@ import { authFirebase } from './auth';
 
 export function apiClient() {
   return Axios.create({
-    baseURL: 'https://siacauth.now.sh/api/v1',
+    baseURL: process.env.API_URL_BASE,
     headers: {
       Authorization: `Bearer ${authFirebase.token}`
     }

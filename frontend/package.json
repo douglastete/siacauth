@@ -8,8 +8,8 @@
     "not ie <=11"
   ],
   "scripts": {
-    "start": "rimraf  dist .cache && parcel index.html src/pages/**/*.html --open",
-    "build": "rimraf  dist .cache && parcel index.html src/pages/**/*.html",
+    "start": "cross-env NODE_ENV=development rimraf  dist .cache && parcel index.html src/pages/**/*.html --open",
+    "build": "cross-env NODE_ENV=production rimraf  dist .cache && parcel index.html src/pages/**/*.html",
     "sass": "sass src/assets/scss/materialize.scss src/assets/css/materialize.css",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,6 +17,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "cross-env": "^6.0.3",
     "cssnano": "^4.1.10",
     "rimraf": "^3.0.0"
   },
