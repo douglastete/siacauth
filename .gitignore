@@ -2,6 +2,5 @@ backend/node_modules
 frontend/node_modules
 frontend/.cache
 frontend/dist
-backend/src/firebase-admin/firebase-adminsdk.json
 frontend/.env.development
 frontend/.env.production
