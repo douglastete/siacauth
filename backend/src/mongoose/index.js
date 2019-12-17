@@ -17,6 +17,7 @@ mongoose
 
       Order.watch().on('change', change => {
         console.log(`[SERVER_CHANGE_STREAM] User:`, change);
+        console.log(`[SERVER_CHANGE_STREAM] User:`, change);
         serverIO.emit('changeData', change);
       });
 
