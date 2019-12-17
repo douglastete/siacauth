@@ -1,19 +1,11 @@
 const mongoose = require('mongoose');
-const http = require('http');
 
-const { SERVER_PORT = 3000 } = process.env;
-const server = http.createServer((req, res) => {
-  res.end('Hello World!');
-});
-
-const serverIO = require('socket.io')(server, { serveClient: false });
 const Order = require('../models/pedidos');
 
 mongoose
   .connect(
     'mongodb+srv://douglas:manager@cluster0-xp2rg.mongodb.net/siacauth?retryWrites=true&w=majority',
     {
-      // .connect('mongodb://localhost:27017/siacauth?retryWrites=true&w=majority', {
       useNewUrlParser: true,
       useUnifiedTopology: true
     },
