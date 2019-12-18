@@ -4,3 +4,4 @@ frontend/.cache
 frontend/dist
 frontend/.env.development
 frontend/.env.production
+backend/src/firebase-admin/firebase-adminsdk.json
