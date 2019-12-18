@@ -6,7 +6,7 @@ import { apiClient } from '../../assets/js/axios.factory';
 import { companyLogged } from '../../assets/js/companyLogged';
 
 const io = require('socket.io-client');
-const socket = io.connect(process.env.API_URL_BASE);
+const socket = io.connect(process.env.SOCKET_URL_BASE);
 
 init();
 
