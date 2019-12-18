@@ -22,17 +22,32 @@ function init() {
   });
 
   const btnRefresh = document.getElementById('btnRefresh');
-  btnRefresh.addEventListener('click', getOrders);
+  btnRefresh.addEventListener('click', () => {
+    getOrders();
+  });
   getOrders();
   configureRealTime();
 }
 
 function configureRealTime() {
   socket.on('changeData', payload => {
+    console.log(payload);
     if (payload.operationType === 'insert') {
       createOrder(payload.fullDocument);
     } else if (payload.operationType == 'delete') {
       removeOrder(payload.documentKey._id);
+    } else if (payload.operationType == 'replace') {
+      if (payload.fullDocument.liberado || payload.fullDocument.cancelado) {
+        removeOrder(payload.documentKey._id);
+      } else {
+        removeOrder(payload.documentKey._id);
+        createOrder(payload.fullDocument);
+      }
+    } else if (payload.operationType == 'update') {
+      const fields = payload.updateDescription.updatedFields;
+      if ((fields.cancelado && fields.cancelado === true) || (fields.liberado && fields.liberado === true)) {
+        removeOrder(payload.documentKey._id);
+      }
     }
   });
 }
@@ -66,14 +81,42 @@ async function clearOrders() {
   }
 }
 
+function showEmptyInfo() {
+  const container = document.getElementById('divOrders');
+  const divRow = document.createElement('div');
+  divRow.className = 'row';
+  divRow.id = 'divNenhumPedido';
+  container.appendChild(divRow);
+
+  const divCol = document.createElement('div');
+  divCol.className = 'col s12 m6 l4 margin-auto';
+  divRow.appendChild(divCol);
+
+  const divCard = document.createElement('div');
+  divCard.className = 'card blue lighten-1';
+  divCol.appendChild(divCard);
+
+  const divCardContent = document.createElement('div');
+  divCardContent.className = 'card-content white-text';
+  divCard.appendChild(divCardContent);
+
+  const spanTitle = document.createElement('span');
+  spanTitle.className = 'card-title';
+  spanTitle.innerText = 'Não há nenhum pedido a ser liberado!';
+  divCardContent.appendChild(spanTitle);
+}
+
 async function removeOrder(order) {
   const container = document.getElementById('divOrders');
   container.childNodes.forEach(element => {
-    if (element.order._id === order) {
+    if (element.order && element.order._id === order) {
       container.removeChild(element);
       return;
     }
   });
+  if (container.childElementCount === 0) {
+    showEmptyInfo();
+  }
 }
 
 async function showOrders() {
@@ -87,12 +130,22 @@ async function showOrders() {
       orders = resp.data.response;
     });
 
+  if (!orders || orders.length === 0) {
+    showEmptyInfo();
+    return;
+  }
+
   orders.forEach(order => {
     createOrder(order);
   });
 }
 
 function createOrder(order) {
+  const divNenhumPedido = document.getElementById('divNenhumPedido');
+  if (divNenhumPedido) {
+    divNenhumPedido.remove();
+  }
+
   const container = document.getElementById('divOrders');
   const divCol = document.createElement('div');
   divCol.order = order;
@@ -183,6 +236,7 @@ async function unlockOrder(el) {
     .put(`/orders/${order._id}`, order)
     .then(resp => {
       if (resp.data.success) {
+        removeOrder(order._id);
         const card = el.target.parentNode.parentNode;
         const container = card.parentNode;
         container.remove(card);
@@ -202,9 +256,7 @@ async function cancelOrder(el) {
     .put(`/orders/${order._id}`, order)
     .then(resp => {
       if (resp.data.success) {
-        const card = el.target.parentNode.parentNode;
-        const container = card.parentNode;
-        container.remove(card);
+        removeOrder(order._id);
         M.toast({ html: `Pedido ${order.pedidoid} cancelado com sucesso!` });
       }
     })

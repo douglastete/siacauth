@@ -2,7 +2,6 @@ import AddToHomeScreen from 'a2hs.js';
 
 import { authFirebase } from './src/assets/js/auth';
 
-
 authFirebase.listenerState();
 
 const img = document.getElementById('imgA2HS');
