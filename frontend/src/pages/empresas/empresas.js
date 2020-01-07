@@ -42,6 +42,9 @@ function showCompanies() {
   }
 
   function clearElement(el) {
+    if (!el) {
+      return;
+    }
     el.querySelectorAll('*').forEach(n => n.remove());
     el.innerHTML = '';
     return el;
